@@ -1,0 +1,27 @@
+import 'petriNet.ecore'
+
+package petriNet
+
+
+context PetriNet /*nom valide */
+inv validName('Invalid name: ' + self.name):
+    self.name.matches('[A-Za-z][A-Za-z0-9]*')
+
+
+context place
+inv Init: self.nb_jeton >= 0
+
+context Arc
+inv nombre_jetons: self.token_nb >= 1
+
+
+context Arc
+inv source_cible_Arc: self.cible.oclIsTypeOf(place) <> self.source.oclIsTypeOf(place)
+
+context place
+inv nameIsDefined: if self.name.oclIsUndefined() then false
+                   else self.name <> ''
+                   endif
+
+
+endpackage

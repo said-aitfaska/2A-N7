@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<petrinet:PetriNet
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:petrinet="http://petrinet"
+    xsi:schemaLocation="http://petrinet petriNet.ecore"
+    name="exemplePetrinet">
+  <petrinetElement>
+    <arc token_nb="2"
+        type_arc="arc"
+        source="//@petrinetElement/@node.0"
+        cible="//@petrinetElement/@node.2"/>
+    <arc token_nb="2"
+        type_arc="arc"
+        source="//@petrinetElement/@node.2"
+        cible="//@petrinetElement/@node.1"/>
+    <node xsi:type="petrinet:place"
+        name="p1"
+        arcSortant="//@petrinetElement/@arc.0"
+        nb_jeton="2"/>
+    <node xsi:type="petrinet:place"
+        name="p2"
+        arcEntrant="//@petrinetElement/@arc.1"
+        nb_jeton="1"/>
+    <node xsi:type="petrinet:Transition"
+        name="tr"
+        arcEntrant="//@petrinetElement/@arc.0"
+        arcSortant="//@petrinetElement/@arc.1"/>
+  </petrinetElement>
+</petrinet:PetriNet>
