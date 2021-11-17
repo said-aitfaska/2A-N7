@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1 id="parallélisme-en-java">Parallélisme en Java</h1>
+<p>≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈</p>
+<h2 id="objectifs">Objectifs</h2>
+<hr />
+<ul>
+<li>utiliser la classe <code>Thread</code> pour la gestion de base des activités concurrentes en Java</li>
+<li>mettre en œuvre la synchronisation par verrouillage en Java</li>
+<li>évaluer le gain, le coût et le contexte approprié à la mise en œuvre multi-activités d'un traitement</li>
+<li>connaître les services d'exécution de la plateforme Java</li>
+</ul>
+<h2 id="guide-de-lecture-et-de-progression">Guide de lecture et de progression</h2>
+<hr />
+<p>Ce document comporte 2 parties principales. Chaque partie comporte une section de préparation qui présente et illustre les éléments techniques nécessaires à la réalisation des exercices proposés dans la section suivante.</p>
+<p>La première partie (<em>« Activités Java »</em>) porte sur les bases de la programmation concurrente en Java (gestion des activités, synchronisation élémentaire). Elle devrait être réalisée complètement en TP.</p>
+<p>La seconde partie (<em>« Parallélisme régulé »</em>) aborde les services d'exécution disponibles sur la plateforme Java. Elle constitue un approfondissement, destiné aux étudiants désireux d'aller un peu plus loin sur le sujet. Par conséquent, si la section « préparation » est destinée à être lue et comprise par tous, la section « exercices » pourra être traitée (ou pas) en fonction de votre progression et de votre intérêt.</p>
+<p>Les fournitures utiles aux exercices de chacune des parties sont disponibles dans des répertoires distincts.</p>
+<h2 id="activités-java">Activités Java</h2>
+<hr />
+<h2 id="préparation">Préparation</h2>
+<p>Cette partie présente quelques constructions et outils disponibles sur la plateforme Java, en se limitant aux éléments nécessaires à la réalisation des exercices.</p>
+<h3 id="les-activités-threads-java">Les activités (threads) Java</h3>
+<p>La brève présentation qui suit peut être illustrée par la lecture de la partie correspondante du cours (planches 23-25).</p>
+<ul>
+<li>la classe <strong><code>Thread</code></strong>, intégrée au langage (paquetage <code>java.lang</code>), permet de <em>définir</em> un processus (léger), ou thread au sein d'une application Java (JVM)</li>
+<li>la classe Thread fournit (en particulier)
+<ul>
+<li>une méthode <strong><code>start</code></strong> qui permet de <em>lancer</em> l'instance de thread auquel elle est appliquée</li>
+<li>une méthode <strong><code>join</code></strong> (<code>void join() throws InterruptedException</code>), qui permet d'attendre la terminaison l'instance de thread auquel elle est appliquée</li>
+<li>une méthode de classe, <code>static Thread currentThread()</code> qui fournit la référence du thread en cours d'exécution</li>
+<li>une méthode de classe, <code>static void sleep(long ms) throws InterruptedException</code> qui suspend le thread appelant pour une durée de <code>ms</code> millisecondes</li>
+</ul></li>
+<li>le constructeur de la classe <code>Thread</code> prend un paramètre d'une classe implémentant l'interface <strong><code>Runnable</code></strong>. Cette interface expose une méthode <strong><code>public void run()</code></strong>. La méthode <code>run()</code> définit le code qui sera exécuté par le thread correspondant.</li>
+</ul>
+<p><strong>Les planches 23 et 24 fournissent des exemples simples du schéma standard de création de threads</strong></p>
+<h3 id="les-verrous-java">Les verrous Java</h3>
+<p>Historiquement, il s'agit du premier outil de synchronisation proposé en Java, disponible dès les premières versions du langage. Le service rendu, très élémentaire, s'avère pratique et adapté pour exprimer l'exclusion mutuelle, ce qui fait qu'il reste largement utilisé, même actuellement, car la simple exclusion mutuelle représente le schéma de synchronisation le plus souvent rencontré. En revanche, il se révèle lourd et malcommode dès qu'il s'agit de réaliser des schémas un peu plus évolués que l'exclusion mutuelle. D'où les objets de synchronisation plus classiques et robustes apparus à partir de la version 5 de Java.</p>
+<p>La rapide présentation qui suit porte essentiellement sur la syntaxe. Elle peut être complétée par la lecture de la partie correspondante du cours sur les processus légers (planches 30-34) pour les notions et sur la documentation Java en ligne pour les détails techniques.</p>
+<h4 id="principe">Principe</h4>
+<p><strong>Tout objet</strong> Java peut être utilisé comme un verrou pour contrôler l'accès à une section critique.</p>
+<h4 id="syntaxe">Syntaxe</h4>
+<ul>
+<li><p>Le mot-clé <strong><code>synchronized</code></strong> permet de définir très simplement une section critique contrôlée par (le verrou d')un objet <code>unObj</code>, avec la syntaxe suivante <strong><code>synchronized</code></strong> <code>(unObj) {     section critique }</code></p></li>
+<li><p>Le mot-clé <strong><code>synchronized</code></strong> peut aussi être utilisé pour qualifier une méthode. Il indique alors que la méthode sera exécutée en exclusion mutuelle, et que (le verrou de l'instance de) l'objet fournissant cette méthode est utilisé pour contrôler cette exclusion mutuelle.</p></li>
+<li><p>Enfin, il est possible de qualifier des méthodes de classe (statiques) comme <strong><code>synchronized</code></strong>. Dans ce cas, le verrou est associé à la classe, non à ses instances.</p></li>
+</ul>
+<h3 id="autres-classes-méthodes-et-remarques-utiles">Autres classes, méthodes et remarques utiles</h3>
+<ul>
+<li>la classe <code>System</code> fournit deux méthodes, <code>System.nanoTime()</code> et <code>System.currentTimeMillis()</code> qui fournissent une durée écoulée (en ns et ms) depuis une date d'origine non spécifiée. La différence entre les valeurs retournées par deux appels successifs permet d'évaluer le temps écoulé entre ces deux appels.</li>
+<li>Le constructeur de la classe <code>Thread</code> peut prendre un paramètre de classe <code>String</code>, qui permet de donner un nom à l'instance de Thread créée. Le nom peut être accédé via les méthodes <code>getName()</code> et <code>setName()</code></li>
+<li><p>Selon votre configuration, il est possible que le format par défaut pour les fichiers source Java soit le format ASCII. Dans ce cas, des erreurs apparaitront lors de la compilation des fichiers de l'archive, qui sont codés en UTF8. Pour remédier à cela, il est possible de positionner la variable d'environnement JAVA_TOOL_OPTIONS (en bash : <code>export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8</code>), ou encore de lancer la compilation avec l'option <code>-encoding UTF8</code>, ce qui donne ici :</p>
+<pre><code>javac -encoding UTF8 *.java</code></pre></li>
+<li>l'interpréteur Java (commande <code>java</code>) founit deux options qui ne seront pas forcément nécessaires ici, mais qui peuvent être utiles dans un contexte d'évaluation de performances :</li>
+<li><code>-Xint</code> force le passage en mode interprété pur (pas de compilation à la volée, ni par conséquent d'optimisation)</li>
+<li><p><code>-Xprof</code> fournit des statistiques sur les temps d'exécution des threads.</p></li>
+</ul>
+<h2 id="exercices">Exercices</h2>
+<h3 id="efficacité-de-la-parallélisation">Efficacité de la parallélisation</h3>
+<p>Il s'agit d'évaluer le gain de temps apporté par la décomposition d'un traitement en plusieurs threads.</p>
+<p>La classe <code>IncrMes</code> fournie dans l'archive propose une base pour évaluer ce gain de temps. Elle compare le temps d'exécution de N threads exécutant une boucle qui incrémente un compteur global avec le temps d'exécution de N boucles en séquence, chaque boucle effectuant le même nombre d'itération qu'un thread. (N étant un paramètre fourni au lancement de l'application.)</p>
+<ul>
+<li>Quel résultat « naïf » peut-on a priori espérer ?</li>
+<li>Evaluer le surcoût induit par la gestion des threads, en fonction de N (en faisant varier N entre 1 et 30, sans nécessairement prendre toutes les valeurs :) ).</li>
+<li>Interpréter ce résultat et conclure.</li>
+</ul>
+<h3 id="coût-de-la-cohérence">Coût de la cohérence</h3>
+<p>Vérifier la correction des résultats obtenus par l'application précédente. Pour cela, chaque thread affichera la valeur du compteur avant de démarrer sa (fraction de) boucle, ainsi que la valeur du compteur après.</p>
+<ul>
+<li>Quelles seront <em>a priori</em> les valeurs affichées dans le cas où il n'y a pas préemption du processeur entre threads ?</li>
+<li>Quelles seront <em>a priori</em> les valeurs affichées dans le cas où la gestion des activités partage le temps processeur par quantum de temps entre threads ?</li>
+<li>Quelle est la politique effectivement suivie par la JVM utilisée pour le test ?</li>
+<li>La valeur finale du compteur devrait être égale au nombre total d'itérations. Vérifier que ce n'est pas le cas avec la version actuelle, et expliquer pourquoi.</li>
+<li>Afin de garantir la cohérence du résultat final, on effectue les incrémentations du compteur en exclusion mutuelle, en plaçant l'incrémentation dans un bloc <code>synchronized</code>, associé à un objet global quelconque. (Déclarer par exemple un attribut <code>static Object mutex = new Object();</code> dans la classe principale). Vérifier que le résultat est maintenant effectivement correct, et évaluer le coût de l'utilisation de ce mécanisme
+<ul>
+<li>en plaçant uniquement l'incrémentation de la boucle interne dans le bloc <code>synchronized</code></li>
+<li>en plaçant la boucle interne dans le bloc <code>synchronized</code></li>
+<li>conclure globalement sur les conditions d'utilisation de ce mécanisme.</li>
+</ul></li>
+</ul>
+<h2 id="parallélisme-régulé">Parallélisme régulé</h2>
+<hr />
+<h2 id="préparation-services-de-régulation-des-activités-en-java">Préparation : services de régulation des activités en Java</h2>
+<p><em>La rapide présentation qui suit peut être complétée par la lecture de la partie correspondante du cours (planches 28-33) pour les notions et sur la <a href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/package-summary.html">documentation Java en ligne</a> pour la syntaxe et les détails techniques.</em></p>
+<p>Les classes et notions utilisées dans la première partie étaient destinées à définir et gérer la concurrence explicitement, et à un niveau fin : le choix de lancer, d'attendre et de terminer une tâche appartient entièrement au programmeur.</p>
+<p>La plateforme Java fournit dans ses dernières versions la classe <code>Executor</code>, destinée à séparer la gestion des activités des aspects purement applicatifs. Le principe est qu'un objet de la classe <code>Executor</code> (« exécuteur ») fournit un <em>service</em> de gestion et d'ordonnancement d'activités, auquel on soumet des <em>tâches</em> à traiter. Une application est donc vue comme un ensemble de tâches qui sont fournies à l'exécuteur. L'exécuteur gère alors l'exécution des tâches qui lui sont soumises de manière indépendante et transparente pour l'application. L'objectif de ce service est de permettre</p>
+<ul>
+<li>de simplifier la tâche du programmeur, puisqu'il n'a plus à gérer le démarrage des activités, ni leur ordonnancement</li>
+<li>d'adapter le nombre d'activités exécutées à la charge et au nombre de processeurs physiques disponibles</li>
+</ul>
+<p>Le paquetage <code>java.util.concurrent</code> définit 3 interfaces pour les exécuteurs :</p>
+<ul>
+<li><code>Executor</code>, qui fournit une méthode <code>execute</code>, permettant de soumettre une tâche <code>Runnable</code>.</li>
+<li><code>ExecutorService</code>, qui étend <code>Executor</code>, avec une méthode <code>submit</code>, permettant de soumettre une tâche <code>Callable</code> et renvoyant un objet <code>Future</code>, lequel permet de récupérer la valeur de retour de la tâche <code>Callable</code> soumise. Un <code>ExecutorService</code> permet en outre de soumettre des ensembles de tâches <code>Callable</code>, et de gérer la terminaison de l'exécuteur.</li>
+<li><code>ScheduledExecutorService</code>, qui étend <code>ExecutorService</code> avec des méthodes permettant de spécifier l'ordonnancement des tâches soumises.</li>
+</ul>
+<p>Le paquetage <code>java.util.concurrent</code> fournit différentes implémentations d'exécuteurs. Le principe commun aux exécuteurs est de distribuer les tâches soumises à un ensemble d'ouvriers. Chaque ouvrier est un thread cyclique, qui traite une par une les tâches qui lui sont attribuées.</p>
+<p>Les exécuteurs utilisés pour cette partie sont les</p>
+<h3 id="pools-de-threads">Pools de threads</h3>
+<p>La classe <code>java.util.concurrent.Executors</code> fournit des méthodes permettant de créer des pools de threads implantant <code>ExecutorService</code> avec un nombre d'ouvriers fixe -- méthode <code>newFixedThreadPool</code> --, variable (adaptable) -- méthode <code>newCachedThreadPool</code>) ou permettant une régulation par vol de tâches (voir cours) (méthode <code>newWorkStealingPool</code>). Une variante implantant <code>ScheduledExecutorService</code> est proposée pour chacune de ces méthodes, afin de permettre d'intervenir sur l'ordonnancement des tâches. Enfin, les classes <code>java.util.concurrent.ThreadPoolExecutor</code> et <code>java.util.concurrent.ScheduledThreadPoolExecutor</code> proposent encore davantage d'options sur la paramétrage et la supervision de l'ordonnancement.</p>
+<p>Les pools de threads évitent la création de nouveaux threads pour chaque tâche à traiter, puisque qu'un même ouvrier est réutilisé pour traiter une suite de tâches, ce qui présente plusieurs avantages :</p>
+<ul>
+<li>éviter la création de threads apporte un gain (significatif lorsque les tâches sont nombreuses) en termes de consommation de ressources mémoire et processeur,</li>
+<li>le délai de prise en charge des requêtes est réduit du temps de la création du traitant de la requête,</li>
+<li>enfin, et surtout, le contrôle du nombre d'ouvriers va permettre de réguler et d'adapter l'exécution en fonction des ressources matérielles disponibles, au lieu d'avoir une exécution directement dépendante du flux de tâches à traiter. Ainsi, dans le cas d'un flux de tâches augmentant brutalement (comme dans le cas d'une attaque par déni de service), les performances se dégraderont progressivement (car le délai de prise en charge augmentera proportionnellement au nombre de tâches en attente), mais il n'y aura pas d'écroulement dû à un épuisement des ressources nécessaires.</li>
+</ul>
+<p>D'une manière générale,</p>
+<ul>
+<li>Le choix ou l'adaptation du nombre d'ouvriers en fonction du nombre de processeurs effectivement disponibles et de la charge courante est un élément clé de la parallélisation avec un pool de threads : trop peu nombreux, les ouvriers ne pourront exploiter tous les processeurs ; trop nombreux, il mobiliseront des ressources inutilement et auront un impact négatif sur les performances.
+<ul>
+<li><em>Note : l'appel de la méthode <code>Runtime.getRuntime().availableProcessors()</code> fournit le nombre de processeurs disponibles pour la JVM courante.</em></li>
+</ul></li>
+<li>Les pools de threads sont bien adaptés au traitement de problèmes réguliers, c'est à dire aux problèmes décomposables en sous-problèmes de « taille » équivalente, ce qui garantit une bonne répartition des tâches entre ouvriers.</li>
+</ul>
+<h5 id="classes-et-méthodes-utiles">Classes et méthodes utiles</h5>
+<ul>
+<li>la classe <code>java.util.concurrent.Executors</code>, permet de créer des pools de threads par appel de <code>newFixedThreadPool()</code> ou <code>newCachedThreadPool()</code> (cf supra)</li>
+<li>la classe <code>ExecutorService</code> et sa superclasse <code>Executor</code>, définissent l'interface d'un exécuteur, avec notamment les méthodes <code>submit()</code>, <code>execute()</code> (cf supra) et <code>shutdown()</code> (gestion de la terminaison de l'exécuteur)</li>
+<li>la classe <code>Future</code> fournit (immédiatement) une référence vers le résultat (à venir) d'une tâche <code>Callable</code>soumise à l'exécuteur par <code>submit()</code>. L'appel de la méthode <code>get()</code> permet d'obtenir le résultat effectif, en attendant s'il n'est pas encore disponible.</li>
+<li>les tâches ne renvoyant pas de résultat sont des <code>Runnable</code>, soumises à l'exécuteur par <code>execute()</code>.</li>
+</ul>
+<h5 id="un-exemple">Un exemple</h5>
+<pre><code>import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+
+class SigmaC implements Callable&lt;Long&gt; {
+    private long début;
+    private long fin;
+
+    SigmaC(long d, long f) { début = d; fin = f;}
+
+    @Override
+    public  Long call() { // le résultat doit être un objet
+        long s = 0;
+        for (long i = début; i &lt;= fin; i++) s = s + i;
+        return s;
+    }                
+}
+
+class SigmaR implements Runnable {
+    private long début;
+    private long fin;
+
+    SigmaR(long d, long f) { début = d; fin = f;}
+
+    @Override
+    public  void run() {
+        long s = 0;
+        for (long i = début; i &lt;= fin; i++) s = s + i;
+        System.out.println(&quot;Calcul terminé. ∑(&quot;+début+&quot;,&quot;+fin+&quot;) = &quot;+s);
+    }                
+}
+
+public class Somme {     
+    public static void main(String[] args) throws Exception {
+    
+        ExecutorService poule = Executors.newFixedThreadPool(2);
+           
+        Future&lt;Long&gt; f1 = poule.submit(new SigmaC(0L,1_000_000_000L));
+        Future&lt;Long&gt; f2 = poule.submit(new SigmaC(0L,4_000_000_000L));
+        poule.execute(new SigmaR(900_000L,1_000_000_000L));
+        Future&lt;Long&gt; f3 = poule.submit(new SigmaC(1,100));
+        Future&lt;Long&gt; f4 = poule.submit(new SigmaC(0L,3_000_000_000L));
+    
+        poule.shutdown();
+    
+        System.out.println(&quot;Résultat obtenu. f1 = &quot;+f1.get());
+        System.out.println(&quot;Résultat obtenu. f2 = &quot;+f2.get());        
+        System.out.println(&quot;Résultat obtenu. f3 = &quot;+f3.get());        
+        System.out.println(&quot;Résultat obtenu. f4 = &quot;+f4.get());
+    }    
+}</code></pre>
+<h5 id="commentaires">Commentaires</h5>
+<ul>
+<li>L'application crée un pool avec un nombre fixe d'ouvriers (2), puis lance 5 tâches : les deux premières et les deux dernières soumises (<code>Callable</code> , soumises par appel à <code>submit()</code>) rendent un résultat <code>Future</code>, récupéré de manière bloquante par l'appel à la méthode <code>get()</code>. La troisième (<code>Runnable</code>, soumise par appel à <code>execute()</code>) s'exécute de manière asynchrone.</li>
+<li>L'exécution voit la tâche <code>Runnable</code> terminer après la première soumise (<code>f1</code>), car bien que plus courte, elle ne peut démarrer tant que l'une des deux premières tâches lancées n'est pas terminée, la taille du pool étant de 2. L'appel <code>f2.get()</code> entraîne l'attente de la terminaison de <code>f2</code>, plus longue que <code>f1</code>et la tâche <code>Runnable</code> cumulées. L'appel de <code>f3.get()</code> retourne immédiatement, car <code>f3</code>, courte est déjà terminé. L'appel <code>f4.get()</code> entraîne l'attente de la terminaison de <code>f4</code>.</li>
+<li><code>shutdown</code> permet de terminer proprement l'exécuteur, qui dès lors n'accepte plus de nouvelles tâches. L'application Java termine avec la dernière tâche traitée. Si <code>shutdown</code> est omis, l'application ne peut terminer, car les threads de l'exécuteur restent en attente de nouvelles tâches.</li>
+<li>L'archive contient une variante (<code>SommePlus</code>) de l'application <code>Somme</code>, qui illustre l'utilisation de :
+<ul>
+<li><code>invokeAll()</code> sur une collection de tâches/actions pour soumettre une collection (ici une liste) de <code>Callable</code>. Les résultats sont alors rendus dans une liste de <code>Future</code>;</li>
+<li><code>get()</code> sur les <code>Future</code> de cette liste, pour récupérer les résultats effectifs</li>
+</ul></li>
+</ul>
+<h2 id="exercices-1">Exercices</h2>
+<p>Vous aurez vraisemblablement besoin pour cette partie de deux méthodes de classe de la classe <code>System</code> : <code>System.nanoTime()</code> et <code>System.currentTimeMillis()</code> qui fournissent une durée écoulée (en ns et ms) depuis une date d'origine non spécifiée. La différence entre les valeurs retournées par deux appels successifs permet d'évaluer le temps écoulé entre ces deux appels.</p>
+<p>L'archive fournie propose différents exercices. Chaque exercice comporte un calcul séquentiel (itératif ou récursif), qu'il faut paralléliser en utilisant un pool de threads. Chaque exercice comporte une méthode main permettant de lancer et comparer les différentes versions. Des commentaires <code>// ********* A compléter</code> ou <code>// ********* A corriger</code> signalent les (seuls) endroits du code où vous devez intervenir pour implanter les versions parallèles du calcul séquentiel fourni.</p>
+<p>Les exercices utilisent des tableaux d'entiers stockés sur disque. L'application GCVT.java propose une classe <code>TableauxDisque</code> permettant de générer, charger en mémoire, sauvegarder ou comparer de tels tableaux. La méthode <code>main</code>de l'application GCVT.java permet en outre d'appeler les méthodes de la classe <code>TableauxDisque</code> depuis la console.</p>
+<p><em>Cette application pourra en particulier être utilisée pour générer les jeux de données utiles aux tests.</em> En effet, pour que le gain apporté par les versions parallèles soit sensible, il est nécessaire que les volumes de données traités soient significatifs, ce qui implique ici de travailler (pour l'évaluation de performances) sur des tableaux de 1 à 100 millions d'entrées, ce qui aurait alourdi inutilement l'archive. Vous devrez donc générer vos jeux de données avec cette application, <em>sans oublier de supprimer les fichiers créés une fois le TP passé</em>, sans quoi vous risquez d'épuiser votre quota d'espace disque :)</p>
+<p>Les exercices peuvent être traités dans l'ordre suivant :</p>
+<ul>
+<li>Calcul du maximum d'un tableau (répertoire <code>max</code>). Le calcul d'un opérateur associatif et commutatif sur un ensemble de données est une application canonique de la parallélisation. Cet exercice permet de mettre simplement et directement en pratique un pool de threads.
+<ul>
+<li>Notez que le calcul étant très simple, il est important pour évaluer les performances de cet exercice de travailler avec un grand tableau.</li>
+<li>Comparer la version pool fixe avec la version séquentielle.</li>
+</ul></li>
+<li>Tri d'un tableau selon le schéma tri-fusion (répertoire <code>tri fusion</code>).
+<ul>
+<li>Paralléliser l'algorithme récursif proposé en utilisant un pool fixe.</li>
+<li>Comparer cette version avec la version séquentielle, en termes de facilité de conception, et de performances. Pour cet exercice, un tableau d'un million d'entrées devrait suffire.</li>
+</ul></li>
+</ul>
+<h2 id="tester-les-performances-dapplications-concurrentes-en-java-quelques-remarques-pratiques">Tester les performances d'applications concurrentes en Java : quelques remarques pratiques</h2>
+<ul>
+<li>sources de perturbation : cache, compilateur à la volée, ramasse miettes et optimiseur, charge de l'environnement (matériel, réseau) -&gt; répéter les mesures et retenir la meilleure</li>
+<li>tester sur des volumes de données significatifs</li>
+<li>connaître le nombre de processeurs réels disponibles</li>
+<li>éviter les optimisations sauvages
+<ul>
+<li>avoir des tâches suffisamment complexes<br />
+</li>
+<li>avoir un jeu de données varié (non constant en valeur et dans le temps)</li>
+</ul></li>
+<li>arrêter la décomposition en sous tâches à un seuil raisonnable</li>
+</ul>
+</body>
+</html>
