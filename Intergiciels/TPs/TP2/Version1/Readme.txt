@@ -1,1 +1,0 @@
-Cette version implique un client (navigateur) et un serveur http en mode TCP
