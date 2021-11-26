@@ -21,7 +21,7 @@ public class ServeurAuthorisation  {
 
 		try {
 
-			// TODO Création de la connexion côté serveur, en spécifiant un port d'écoute
+			
 			
 			DatagramSocket sock = new DatagramSocket(8082);
 			while(true){
@@ -29,7 +29,7 @@ public class ServeurAuthorisation  {
 		  		byte[] buffer_donnes = new byte[cpt];
 		  		DatagramPacket packet = new DatagramPacket(buffer_donnes,cpt);
 
-				// TODO il faut vérifier si le client est autorisé ou pas une fois la
+				// il faut vérifier si le client est autorisé ou pas une fois la
 				// demande d'autoprisation est reçu
 				// le packet doit contenir une demande d'autoprisation (auth_request) pour
 				// un client
@@ -57,7 +57,7 @@ public class ServeurAuthorisation  {
 				// retourner l'autrisation (ok) ou le rejet (ko)
 				byte[] buffer2;
 
-				// TODO structuration et emission de la réponse
+				//  structuration et emission de la réponse
 				buffer2 = AUTH.getBytes();
 				DatagramPacket packet2 = new DatagramPacket(buffer2,buffer2.length);
 				packet2.setLength(buffer2.length);
@@ -66,7 +66,7 @@ public class ServeurAuthorisation  {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//  Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
