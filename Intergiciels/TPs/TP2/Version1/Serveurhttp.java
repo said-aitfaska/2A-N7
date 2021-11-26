@@ -37,7 +37,7 @@ public class Serveurhttp {
 
 	public static void main(String[] args) throws IOException  {
 
-		// TODO créer le socket serveur
+		//  créer le socket serveur
 		
 		ServerSocket serveur_socket = new ServerSocket(8080);
 		
