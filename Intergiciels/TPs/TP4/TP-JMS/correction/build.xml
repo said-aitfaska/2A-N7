@@ -1,0 +1,145 @@
+<project default="compile" basedir=".">
+
+  <!-- Initializes the environment paths and properties -->
+  <target name="init">
+    <!-- Initializes the directory structure properties -->
+    <property name="src.dir" location="src"/>
+    <property name="obj.dir" location="classes"/>
+    <property name="lib.dir" location="../joram/ship/lib"/>
+    <property name="run.dir" location="run"/>
+    <property name="conf.dir" location="config"/>
+    <!-- Project classpath needed for execution -->
+    <path id="project.class.path">
+      <pathelement path="${java.class.path}/"/>
+      <fileset dir="${lib.dir}">
+         <include name="*.jar"/>
+      </fileset>
+      <pathelement path="${obj.dir}/joram"/>
+      <pathelement path="${run.dir}"/>
+    </path>
+    <property name="project.class.path" refid="project.class.path"/>
+  </target>
+
+  <!-- Cleans samples - deletes generated files -->
+  <target name="clean" depends="init"
+          description="--> Deletes generated files">
+    <delete dir="${obj.dir}"/>
+    <delete dir="${run.dir}"/>
+  </target>
+
+  <!-- Prepares the compilation phase -->
+  <target name="prepare" depends="init">
+    <delete quiet="true" dir="${obj.dir}"/>
+    <delete quiet="true" dir="${run.dir}"/>
+    <mkdir dir="${obj.dir}/joram"/>
+  </target>
+
+  <!-- Compiles -->
+  <target name="compile" depends="prepare"
+    description="--> Compile all samples">
+    <javac srcdir="${src.dir}"
+           destdir="${obj.dir}/joram"
+           source="1.5" target="1.5" debug="true"
+           deprecation="${deprecation}"
+           optimize="${optimize}"
+           nowarn="${nowarn}"
+           verbose="${verbose}">
+      <classpath refid="project.class.path"/>
+      <include name="**/*.java"/>
+    </javac>
+  </target>
+
+  <!-- Cleans run directory -->
+  <target name="reset" depends="init"
+          description="--> Cleans run directory">
+    <delete dir="${run.dir}"/>
+  </target>
+
+  <!-- Initializes the centralized configuration -->
+  <target name="simple_init" depends="init">
+    <delete dir="${run.dir}"/>
+    <mkdir dir="${run.dir}"/>
+    <copy file="${conf.dir}/a3config.dtd" todir="${run.dir}"/>
+    <copy file="${conf.dir}/a3debug.cfg" todir="${run.dir}"/>
+    <copy file="${conf.dir}/jndi.properties"
+          tofile="${run.dir}/jndi.properties"/>
+    <copy file="${conf.dir}/centralized_a3servers.xml"
+          tofile="${run.dir}/a3servers.xml"
+          overwrite="true"/>
+  </target>
+
+  <!-- Starts a server -->
+  <target name="server" depends="init">
+    <java classname="fr.dyade.aaa.agent.AgentServer"
+          failonerror="no" fork="yes"
+          dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+      <!-- jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y"/ -->
+      <jvmarg line="-Dcom.sun.management.jmxremote -DMXServer=com.scalagent.jmx.JMXServer"/>
+      <arg line="${sid} ./s${sid}"/>
+    </java>
+  </target>
+
+  <!-- Start a server in NullTransaction mode -->
+  <target name="single_server" depends="simple_init"
+          description="--> Starts a single server in non-persistent mode">
+    <antcall target="server">
+      <param name="sid" value="0"/>
+    </antcall>
+  </target>
+
+
+  <!-- Setup the CreateDestination administration -->
+  <target name="create_destination" depends="init"
+          description="--> Runs CreateDestination administration">
+    <java classname="CreateDestination"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/> 
+    </java>
+  </target>
+
+  <!-- Runs Hello -->
+  <target name="hello" depends="init"
+    description="--> Runs hello example">
+    <java classname="HelloWorld"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+    </java>
+  </target>
+
+  <!-- Runs IRC -->
+  <target name="irc1" depends="init"
+    description="--> Runs IRC application">
+    <java classname="Irc"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+      <arg line="user1"/>
+    </java>
+  </target>
+
+  <!-- Runs IRC -->
+  <target name="irc2" depends="init"
+    description="--> Runs IRC application">
+    <java classname="Irc"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+      <arg line="user2"/>
+    </java>
+  </target>
+
+  <!-- Runs IRC -->
+  <target name="irc3" depends="init"
+    description="--> Runs IRC application">
+    <java classname="Irc"
+      failonerror="no" fork="yes"
+      dir="${run.dir}">
+      <classpath path="${project.class.path}"/>
+      <arg line="user3"/>
+    </java>
+  </target>
+
+</project>
